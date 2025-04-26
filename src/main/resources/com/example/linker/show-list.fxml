@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.control.ListView?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.linker.UserUI.ShowList"
+            prefHeight="400.0" prefWidth="800.0">
+
+    <!-- 可捲動的 ListView，填滿整個畫面 -->
+    <ListView fx:id="listView"
+              AnchorPane.topAnchor="20.0"
+              AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="100.0"
+              AnchorPane.bottomAnchor="20.0"/>
+</AnchorPane>

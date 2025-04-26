@@ -1,0 +1,14 @@
+# Java 編譯產物
+/target/
+/out/
+
+# IntelliJ 設定
+.idea/
+*.iml
+
+# 操作系統垃圾檔
+.DS_Store
+Thumbs.db
+
+# 日誌檔案
+*.log

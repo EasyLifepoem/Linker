@@ -1,0 +1,43 @@
+NAME: 用戶
+WebType:
+  - type: hentai
+    links:
+      - name: 內容1
+        URL: https://www.pixiv.net/
+      - name: 內容2
+        URL: https://example.com/hentai2
+      - name: 內容3
+        URL: https://www.pixiv.net/
+      - name: 內容4
+        URL: https://example.com/hentai2
+      - name: 內容5
+        URL: https://www.pixiv.net/
+      - name: 內容6
+        URL: https://example.com/hentai2
+      - name: 內容7
+        URL: https://www.pixiv.net/
+      - name: 內容8
+        URL: https://example.com/hentai2
+      - name: 內容1
+        URL: https://www.pixiv.net/
+      - name: 內容2
+        URL: https://example.com/hentai2
+      - name: 內容3
+        URL: https://www.pixiv.net/
+      - name: 內容4
+        URL: https://example.com/hentai2
+      - name: 內容5
+        URL: https://www.pixiv.net/
+      - name: 內容6
+        URL: https://example.com/hentai2
+      - name: 內容7
+        URL: https://www.pixiv.net/
+      - name: 內容8
+        URL: https://example.com/hentai2
+
+  - type: Wacg
+    links:
+      - name: 內容1
+        URL: https://example.com/wacg1
+      - name: 內容2
+        URL: https://example.com/wacg2
