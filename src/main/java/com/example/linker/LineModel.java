@@ -74,6 +74,8 @@ public class LineModel {
     public static class LinkEntry {
         private String name; // 顯示名稱
         private String URL;  // 網址
+        //放號碼
+        private Integer Number;
 
         public LinkEntry() {}
 
@@ -90,5 +92,10 @@ public class LineModel {
         public String getURL() {return URL;}
         @JsonProperty("URL")
         public void setURL(String URL) {this.URL = URL;}
+        @JsonProperty("Number")
+        public Integer getNumber() { return Number; }
+        @JsonProperty("Number")
+        public void setNumber(Integer number) { this.Number = number; }
+
     }
 }

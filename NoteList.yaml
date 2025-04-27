@@ -1,0 +1,55 @@
+---
+NAME: "用戶"
+WebType:
+- type: "hentai"
+  links:
+  - name: "內容1"
+    Number: null
+    URL: "https://www.pixiv.net/"
+  - name: "內容2"
+    Number: null
+    URL: "https://example.com/hentai2"
+  - name: "內容4"
+    Number: null
+    URL: "https://example.com/hentai2"
+  - name: "內容6"
+    Number: null
+    URL: "https://example.com/hentai2"
+  - name: "內容1"
+    Number: null
+    URL: "https://www.pixiv.net/"
+  - name: "內容2"
+    Number: null
+    URL: "https://example.com/hentai2"
+  - name: "內容3"
+    Number: null
+    URL: "https://www.pixiv.net/"
+  - name: "內容4"
+    Number: null
+    URL: "https://example.com/hentai2"
+  - name: "內容5"
+    Number: null
+    URL: "https://www.pixiv.net/"
+  - name: "內容6"
+    Number: null
+    URL: "https://example.com/hentai2"
+  - name: "內容7"
+    Number: null
+    URL: "https://www.pixiv.net/"
+- type: "Wacg"
+  links:
+  - name: "內容1"
+    Number: null
+    URL: "https://example.com/wacg1"
+- type: "wnacg"
+  links:
+  - name: "(C105) [つくてん (円つくも)] 煽情妃~誘惑されて押し倒されて~ (ブルーアーカイブ)｜煽情妃 ~先是被其诱惑 又是被其推倒~ [欶\
+      澜汉化组]-紳士漫畫移動版-專注分享漢化本子"
+    Number: 299410
+    URL: "https://www.wnacg.com/photos-index-aid-299410.html"
+  - name: "[Point M (まんす)] 全肯定生徒。｜全肯定学生。 -合集- (ブルーアーカイブ)[中国翻訳][疏碼][DL版]-紳士漫畫移動版-專注\
+      分享漢化本子"
+    Number: 298991
+    URL: "https://www.wnacg.com/photos-index-aid-298991.html"
+
+

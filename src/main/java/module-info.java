@@ -8,6 +8,7 @@ module com.example.linker {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires java.desktop;
+    requires java.net.http;
 
     opens com.example.linker to javafx.fxml;
     //新增UserUI的路徑

@@ -3,10 +3,12 @@ package com.example.linker;
 import com.example.linker.LineModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import javafx.scene.control.Alert;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -16,7 +18,8 @@ import java.nio.file.Paths;
 public class YamlService {
     // 建立一個 ObjectMapper，使用 YAML 格式處理資料
     private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
+    // 外部實體檔案路徑（在 jar 同層）
+    private static final Path externalYamlPath = Paths.get("NoteList.yaml");
     /**
      * 從 classpath 中讀取 NoteList.yml
      * @return 讀取成功則回傳 LineModel，失敗則回傳空物件或 null
@@ -26,14 +29,15 @@ public class YamlService {
          * 找相對路徑下的NoteList.yml 存進input
          * 重要的一點是：使用 try-with-resources 自動關閉 InputStream
          */
-        try (InputStream input = YamlService.class.getResourceAsStream("/NoteList.yaml")) {
-            // 如果找不到 YAML 檔案
-            if (input == null) {
-                System.out.println("找不到 NoteList.yml");
-                return new LineModel();// 回傳一個新的空白 LineModel 物件，防止錯誤
+        try {
+            // 1. 檢查外部 YAML 是否存在
+            if (!Files.exists(externalYamlPath)) {
+                // 如果不存在，自動複製 classpath 裡面的範本
+                copyYamlFromClasspath();
             }
-            // 使用 ObjectMapper 把 YAML 解析成 LineModel 類別
-            return mapper.readValue(input, LineModel.class);
+            // 2. 使用外部檔案載入
+            return mapper.readValue(externalYamlPath.toFile(), LineModel.class);
+
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -45,21 +49,47 @@ public class YamlService {
      * 注意：寫入需要實體檔案路徑，JAR 執行時不能寫進 classpath 裡
      * @param model 要寫入的 LineModel 資料
      */
+    /**
+     * 寫入 YAML：只寫外部檔案
+     */
     public static void writeYaml(LineModel model) {
-        try {
-            // 取得 classpath 中 NoteList.yml 的 URL
-            URL resourceUrl = YamlService.class.getResource("/NoteList.yml");
-            if (resourceUrl == null) {
-                System.err.println("無法寫入：找不到 NoteList.yaml 實體路徑");
-                return;
-            }
-            // 把 URL 轉成實體檔案路徑（Path 物件）
-            var path = Paths.get(resourceUrl.toURI());
-            // 使用 ObjectMapper 把 LineModel 轉成 YAML 檔案寫回去
-            mapper.writeValue(path.toFile(), model);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (model == null) {
+            showError("保存失敗：資料為空！");
+            return;
         }
+        try {
+            mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(externalYamlPath.toFile(), model);
+            System.out.println("資料已成功保存到 NoteList.yaml！");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("保存 YAML 失敗！");
+        }
+    }
+    /**
+     * 若外部 YAML 檔不存在，從 classpath 複製出初始範本
+     */
+    private static void copyYamlFromClasspath() {
+        try (InputStream input = YamlService.class.getResourceAsStream("/NoteList.yaml")) {
+            if (input == null) {
+                throw new IOException("找不到內建 NoteList.yaml！");
+            }
+            Files.copy(input, externalYamlPath);
+            System.out.println("已從範本複製 NoteList.yaml 到外部目錄！");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("初始化 NoteList.yaml 失敗！");
+        }
+    }
+
+    /**
+     * 顯示錯誤提示視窗
+     */
+    private static void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("錯誤");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
