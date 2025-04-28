@@ -9,16 +9,21 @@ import com.example.linker.OtherFunction.DismantleWeb;
 import com.example.linker.OtherFunction.HtmlFetcher;
 
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.text.Text;
+import javafx.util.Pair;
+
 
 public class Addob_List {
 
-    YamlService yml;
+    @FXML
+    private Text statusText;
 
     @FXML
     private TextArea linkInput; // 綁定 FXML 中輸入網址的 TextArea 元件
@@ -59,7 +64,7 @@ public class Addob_List {
             //新增這段：抓取 HTML
             String html = HtmlFetcher.fetchHtml(url);
             //用 DismantleWeb 分析 title
-            String name = DismantleWeb.analyze_Title(html);
+            String name = DismantleWeb.analyze_wnacg_Title(html);
 
             // 若未取得 title，則以網址路徑最後一段作為備案
             if (name == null || name.isEmpty()) {
@@ -105,14 +110,13 @@ public class Addob_List {
             // 特殊類型網站額外處理（提取 ID）
             targetWebType.getLinks().add(newLink);
 
-            System.out.println("新增連結成功！");
-
+            showStatus("新增成功！",true);
             // 儲存更新後的資料到 YAML
             YamlService.writeYaml(model);
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("網址解析失敗！");
+            showStatus("解析失敗！",false);
         }
     }
 
@@ -134,23 +138,33 @@ public class Addob_List {
     /**
      * 顯示提示訊息
      */
-    private void showAlert(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("訊息");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void showStatus(String message, boolean success) {
+        if (statusText != null) {
+            statusText.setText(message);
+            if (success) {
+                statusText.setStyle("-fx-fill: green;");
+            } else {
+                statusText.setStyle("-fx-fill: red;");
+            }
+        } else {
+            System.out.println("狀態欄位未綁定：" + message);
+        }
     }
 
-    /**
-     * 專門處理 wnacg 類型網址
-     */
-    private Integer Wnacg_Number(String url) {
+    private Pair<Integer, String> Wnacg_Number(String url) {
         try {
+            // 抓數字
             Pattern pattern = Pattern.compile("aid-(\\d+)|aid=(\\d+)");
             Matcher matcher = pattern.matcher(url);
+
             if (matcher.find()) {
-                return matcher.group(1) != null ? Integer.parseInt(matcher.group(1)) : Integer.parseInt(matcher.group(2));
+                Integer number = matcher.group(1) != null ? Integer.parseInt(matcher.group(1)) : Integer.parseInt(matcher.group(2));
+
+                // 同時抓 HTML，然後解析<title>
+                String html = HtmlFetcher.fetchHtml(url);
+                String title = DismantleWeb.analyze_wnacg_Title(html);
+
+                return new Pair<>(number, title);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,21 +172,29 @@ public class Addob_List {
         return null;
     }
 
-    /**
-     * 專門處理 18comic 類型網址
-     */
-    private Integer comic_Number(String url) {
+    private Pair<Integer, String> comic_Number(String url) {
         try {
-            Pattern pattern = Pattern.compile("/photo/([0-9]+)");
+            Pattern pattern = Pattern.compile("/album/([0-9]+)");
             Matcher matcher = pattern.matcher(url);
+
             if (matcher.find()) {
-                return Integer.parseInt(matcher.group(1));
+                Integer number = Integer.parseInt(matcher.group(1));
+
+                // ⭐ 這裡改：直接從 URL 後面抓 name
+                int lastSlash = url.lastIndexOf('/');
+                if (lastSlash != -1 && lastSlash + 1 < url.length()) {
+                    String encodedName = url.substring(lastSlash + 1);
+                    String decodedName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
+                    return new Pair<>(number, decodedName);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
+
+
 
     /**
      * 專門處理 nhentai 類型網址
@@ -190,31 +212,46 @@ public class Addob_List {
         return null;
     }
     /**
-     * ⭐ 把特殊處理分類集中在這裡
+     * 根據網站類型（type）對網址（url）進行特別處理：
+     * - 若為特別支援的網站（如 wnacg、18comic、nhentai），則解析出編號與標題
+     * - 若無特別支援，則直接將 URL 當作名稱
+     *
+     * @param type 網站類型（從 host 中提取出來的）
+     * @param url  使用者輸入的完整網址
+     * @param newLink 要填充資料的 LinkEntry 物件
      */
     private void CheckWebTypes(String type, String url, LineModel.LinkEntry newLink) {
+        // 用來裝解析結果：包含編號 (Integer) 和標題 (String)
+        Optional<Pair<Integer, String>> normalCase = Optional.empty();
+
+        // 根據不同網站類型，選擇不同解析方式
         switch (type.toLowerCase()) {
             case "wnacg" -> {
-                Integer number = Wnacg_Number(url);
-                if (number != null) {
-                    newLink.setNumber(number);
-                }
+                // 針對 wnacg 網站，抓取 aid 編號與標題
+                normalCase = Optional.ofNullable(Wnacg_Number(url));
             }
             case "18comic" -> {
-                Integer number = comic_Number(url);
-                if (number != null) {
-                    newLink.setNumber(number);
-                }
+                // 針對 18comic 網站，抓取 album 編號與 og:title
+                normalCase = Optional.ofNullable(comic_Number(url));
             }
             case "nhentai" -> {
+                // 針對 nhentai 網站，抓取 g/編號，標題沿用原本解析結果
                 Integer number = Nhentai_Number(url);
                 if (number != null) {
-                    newLink.setNumber(number);
+                    normalCase = Optional.of(new Pair<>(number, newLink.getName()));
                 }
             }
-            default -> {
-                // 其他網站，不做特別處理
-            }
+            // 預設其他網站，不做任何處理
+        }
+
+        // ⭐ 將解析結果套用到 newLink
+        if (normalCase.isPresent()) {
+            // 有解析結果時，設定編號和標題
+            newLink.setNumber(normalCase.get().getKey()); // 設定編號
+            newLink.setName(normalCase.get().getValue()); // 設定標題
+        } else {
+            // 其他未支援類型，直接將 URL 當作名稱
+            newLink.setName(url);
         }
     }
 }

@@ -2,25 +2,15 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.linker.UserUI.Addob_List"
-            prefHeight="400.0" prefWidth="800.0">
+<AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.linker.UserUI.Addob_List">
 
     <!-- 多行輸入欄位 -->
-    <TextArea fx:id="linkInput"
-              promptText="請輸入連結"
-              layoutX="50.0"
-              layoutY="50.0"
-              prefWidth="550.0"
-              prefHeight="100.0"
-              wrapText="true" />
+    <TextArea fx:id="linkInput" layoutX="50.0" layoutY="50.0" prefHeight="100.0" prefWidth="550.0" promptText="請輸入連結" wrapText="true" />
 
     <!-- 新增一個按鈕並綁定 onAddLink 事件 -->
-    <Button text="添加鏈接"
-            fx:id="addButton"
-            onAction="#onAddLink"
-            layoutX="650.0"
-            layoutY="50.0"/>
+    <Button fx:id="addButton" layoutX="650.0" layoutY="50.0" onAction="#onAddLink" text="添加鏈接" />
+    <Text fx:id="statusText" layoutX="58.0" layoutY="188.0" strokeType="OUTSIDE" strokeWidth="0.0" text="狀態顯示區" />
+
 </AnchorPane>

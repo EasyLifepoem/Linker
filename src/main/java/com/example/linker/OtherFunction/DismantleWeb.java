@@ -1,5 +1,7 @@
 package com.example.linker.OtherFunction;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +12,7 @@ public class DismantleWeb {
      * @param html 網頁的完整 HTML 字串
      * @return title 內容，找不到就回傳空字串
      */
-    public static String analyze_Title(String html) {
+    public static String analyze_wnacg_Title(String html) {
         if (html == null || html.isEmpty()) {
             return "";
         }
@@ -28,6 +30,44 @@ public class DismantleWeb {
             return matcher.group(1).trim();
         } else {
             return "";
+        }
+    }
+
+    /**
+     * 從 HTML 中提取 <meta property="og:title"> 的 content 內容
+     * 特別用於 18comic 等網站
+     * 自動進行 URL 編碼
+     * @param html 網頁的完整 HTML 字串
+     * @return 編碼後的 og:title 內容，找不到就回傳空字串
+     */
+    public static String analyze_comic_Title(String html) {
+        if (html == null || html.isEmpty()) {
+            return "";
+        }
+        Pattern pattern = Pattern.compile(
+                "<meta\\s+property=[\"']og:title[\"']\\s+content=[\"'](.*?)[\"']",
+                Pattern.CASE_INSENSITIVE
+        );
+        Matcher matcher = pattern.matcher(html);
+        if (matcher.find()) {
+            String title = matcher.group(1).trim();
+            return encode(title); // ⭐ 這裡呼叫 encode()
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * 將字串進行 URL 編碼
+     * @param input 原始字串
+     * @return URL 編碼後的字串
+     */
+    public static String encode(String input) {
+        try {
+            return URLEncoder.encode(input, StandardCharsets.UTF_8.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return input; // 出錯就回傳原始字串
         }
     }
 }

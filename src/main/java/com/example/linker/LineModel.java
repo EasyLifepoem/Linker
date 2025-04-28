@@ -96,6 +96,18 @@ public class LineModel {
         public Integer getNumber() { return Number; }
         @JsonProperty("Number")
         public void setNumber(Integer number) { this.Number = number; }
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            sb.append(this.getURL() != null ? this.getURL().split("/")[2] : "未知"); // 從 URL 拿 domain 來當分類
+            sb.append("]");
+            if (this.getNumber() != null) {
+                sb.append("[").append(this.getNumber()).append("]");
+            }
+            sb.append(" - ").append(this.getName() != null ? this.getName() : "未命名");
+            return sb.toString();
+        }
 
     }
 }
