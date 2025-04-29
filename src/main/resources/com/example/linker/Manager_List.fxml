@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.linker.UserUI.Mananger_List"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.linker.UserUI.Mananger_List">
+
+    <!-- ⭐ 把 Label 和 ComboBox 放進 HBox 裡 -->
+    <HBox alignment="CENTER_LEFT" spacing="10" layoutX="39.0" layoutY="41.0">
+        <Label text="選擇瀏覽器：" />
+        <ComboBox fx:id="browserComboBox" prefHeight="36.0" prefWidth="240.0" />
+    </HBox>
+
+    <!-- 新增手動輸入路徑 TextField -->
+    <HBox alignment="CENTER_LEFT" spacing="10" layoutX="39.0" layoutY="100.0">
+        <Label text="自訂路徑：" />
+        <TextField fx:id="customPathField" promptText="請輸入完整執行檔路徑" prefWidth="350.0" />
+        <Button text="加入" onAction="#MantleAddBrowser" />
+    </HBox>
 
 </AnchorPane>

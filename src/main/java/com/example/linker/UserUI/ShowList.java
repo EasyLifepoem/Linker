@@ -3,6 +3,7 @@ package com.example.linker.UserUI;
 // 匯入 JavaFX 所需的類別
 import com.example.linker.HelloApplication;
 import com.example.linker.LineModel;
+import com.example.linker.OtherFunction.ChooseBrowser;
 import com.example.linker.YamlService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,10 +12,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-import java.awt.Desktop;
 import java.io.IOException;
-import java.net.URI;
+
 // ShowList 是這個畫面的控制器，會對應到 FXML 中的 fx:controller
 public class ShowList  {
 
@@ -44,6 +43,7 @@ public class ShowList  {
      */
     private void loadYamlData() {
         LineModel model = HelloApplication.Global_LineModel;
+        ChooseBrowser.setCurrentBrowser(model.getSelectedBrowser());
 
         if (model == null || model.getWebType() == null) {
             listView.getItems().add(new LineModel.LinkEntry("找不到資料！", ""));
@@ -91,6 +91,8 @@ public class ShowList  {
      * ⭐ 從被選取的項目中解析出 URL 並打開它
      * @param selectedItem ListView 中選取的文字
      */
+
+    // ⭐ 點擊連結時開啟網址
     private void openUrlFromSelectedItem(LineModel.LinkEntry selectedItem) {
         try {
             String url = selectedItem.getURL().trim();
@@ -98,12 +100,22 @@ public class ShowList  {
                 System.out.println("無效網址：" + url);
                 return;
             }
-            Desktop.getDesktop().browse(new URI(url));
+
+            // ⭐ 讀取 YAML 中的瀏覽器設定，並設定到 ChooseBrowser
+            LineModel model = HelloApplication.Global_LineModel;
+            if (model != null && model.getSelectedBrowser() != null) {
+                ChooseBrowser.setCurrentBrowser(model.getSelectedBrowser());
+            } else {
+                ChooseBrowser.setCurrentBrowser("System Default");
+            }
+
+            // 🧭 用目前選擇的瀏覽器開啟網址
+            ChooseBrowser.choose(url);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * 從 ListView 中的顯示文字中提取網址
@@ -155,8 +167,6 @@ public class ShowList  {
             }
         }
     }
-
-
 
     @FXML
     private  void BackMain() {

@@ -3,6 +3,7 @@ package com.example.linker;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,10 @@ public class LineModel {
     private String NAME; // 群組名稱 (例如：用戶)
     @JsonProperty("WebType")
     private List<WebType> WebType; // 每個群組下面的網站分類列表
+    @JsonProperty("SelectedBrowser")
+    private String SelectedBrowser; // ⭐ 使用者選擇的瀏覽器名稱
+    @JsonProperty("CustomBrowsers")
+    private List<String> customBrowserPaths = new ArrayList<>();
 
     public LineModel() {}
 
@@ -35,7 +40,16 @@ public class LineModel {
     public List<WebType> getWebType() {return WebType;}
     @JsonProperty("WebType")
     public void setWebType(List<WebType> WebType) {this.WebType = WebType;}
+    @JsonProperty("SelectedBrowser")
+    public String getSelectedBrowser() {return SelectedBrowser;}
 
+    @JsonProperty("SelectedBrowser")
+    public void setSelectedBrowser(String selectedBrowser) {SelectedBrowser = selectedBrowser;}
+    @JsonProperty("CustomBrowsers")
+    public List<String> getCustomBrowserPaths() {return customBrowserPaths;}
+
+    @JsonProperty("CustomBrowsers")
+    public void setCustomBrowserPaths(List<String> customBrowserPaths) {this.customBrowserPaths = customBrowserPaths;}
     /**
      * 內部類：WebType
      * 每個分類型下有多個連結
