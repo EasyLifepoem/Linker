@@ -12,9 +12,14 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.example.linker.AnalysisBase.Base;
+import com.example.linker.AnalysisBase.Wnacg;
+import com.example.linker.AnalysisBase.comic;
+
 
 import javafx.scene.text.Text;
 import javafx.util.Pair;
@@ -151,66 +156,6 @@ public class Addob_List {
         }
     }
 
-    private Pair<Integer, String> Wnacg_Number(String url) {
-        try {
-            // 抓數字
-            Pattern pattern = Pattern.compile("aid-(\\d+)|aid=(\\d+)");
-            Matcher matcher = pattern.matcher(url);
-
-            if (matcher.find()) {
-                Integer number = matcher.group(1) != null ? Integer.parseInt(matcher.group(1)) : Integer.parseInt(matcher.group(2));
-
-                // 同時抓 HTML，然後解析<title>
-                String html = HtmlFetcher.fetchHtml(url);
-                String title = DismantleWeb.analyze_wnacg_Title(html);
-
-                return new Pair<>(number, title);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private Pair<Integer, String> comic_Number(String url) {
-        try {
-            Pattern pattern = Pattern.compile("/album/([0-9]+)");
-            Matcher matcher = pattern.matcher(url);
-
-            if (matcher.find()) {
-                Integer number = Integer.parseInt(matcher.group(1));
-
-                // ⭐ 這裡改：直接從 URL 後面抓 name
-                int lastSlash = url.lastIndexOf('/');
-                if (lastSlash != -1 && lastSlash + 1 < url.length()) {
-                    String encodedName = url.substring(lastSlash + 1);
-                    String decodedName = URLDecoder.decode(encodedName, StandardCharsets.UTF_8);
-                    return new Pair<>(number, decodedName);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-
-    /**
-     * 專門處理 nhentai 類型網址
-     */
-    private Integer Nhentai_Number(String url) {
-        try {
-            Pattern pattern = Pattern.compile("/g/([0-9]+)");
-            Matcher matcher = pattern.matcher(url);
-            if (matcher.find()) {
-                return Integer.parseInt(matcher.group(1));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
     /**
      * 根據網站類型（type）對網址（url）進行特別處理：
      * - 若為特別支援的網站（如 wnacg、18comic、nhentai），則解析出編號與標題
@@ -220,37 +165,46 @@ public class Addob_List {
      * @param url  使用者輸入的完整網址
      * @param newLink 要填充資料的 LinkEntry 物件
      */
-    private void CheckWebTypes(String type, String url, LineModel.LinkEntry newLink) {
-        // 用來裝解析結果：包含編號 (Integer) 和標題 (String)
-        Optional<Pair<Integer, String>> normalCase = Optional.empty();
+    private static final Map<String, Class<? extends Base>> analyzerMap = Map.of(
+            "wnacg", Wnacg.class,
+            "18comic", comic.class
+    );
 
-        // 根據不同網站類型，選擇不同解析方式
-        switch (type.toLowerCase()) {
-            case "wnacg" -> {
-                // 針對 wnacg 網站，抓取 aid 編號與標題
-                normalCase = Optional.ofNullable(Wnacg_Number(url));
-            }
-            case "18comic" -> {
-                // 針對 18comic 網站，抓取 album 編號與 og:title
-                normalCase = Optional.ofNullable(comic_Number(url));
-            }
-            case "nhentai" -> {
-                // 針對 nhentai 網站，抓取 g/編號，標題沿用原本解析結果
-                Integer number = Nhentai_Number(url);
-                if (number != null) {
-                    normalCase = Optional.of(new Pair<>(number, newLink.getName()));
+    /**
+     * 根據網站類型使用對應的分析器進行網址解析。
+     * 若不支援該網站，則使用網址末段作為標題。
+     */
+    private void CheckWebTypes(String type, String url, LineModel.LinkEntry newLink) {
+        try {
+            Class<? extends Base> analyzerClass = analyzerMap.get(type.toLowerCase());
+
+            if (analyzerClass != null) {
+                // 透過反射建立對應分析器
+                Base analyzer = analyzerClass.getConstructor(String.class).newInstance(url);
+                Pair<Integer, String> result = analyzer.getNumber();
+
+                if (result != null) {
+                    newLink.setNumber(result.getKey());
+                    newLink.setName(result.getValue());
+                    return;
+                }
+            } else if (type.equalsIgnoreCase("nhentai")) {
+                // 特殊處理 nhentai
+                Pattern pattern = Pattern.compile("/g/([0-9]+)");
+                Matcher matcher = pattern.matcher(url);
+                if (matcher.find()) {
+                    int number = Integer.parseInt(matcher.group(1));
+                    newLink.setNumber(number);
+                    newLink.setName(url); // 沿用網址作為名稱
+                    return;
                 }
             }
-            // 預設其他網站，不做任何處理
-        }
 
-        // ⭐ 將解析結果套用到 newLink
-        if (normalCase.isPresent()) {
-            // 有解析結果時，設定編號和標題
-            newLink.setNumber(normalCase.get().getKey()); // 設定編號
-            newLink.setName(normalCase.get().getValue()); // 設定標題
-        } else {
-            // 其他未支援類型，直接將 URL 當作名稱
+            // fallback：不支援的類型
+            newLink.setName(url);
+
+        } catch (Exception e) {
+            e.printStackTrace();
             newLink.setName(url);
         }
     }

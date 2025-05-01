@@ -96,8 +96,6 @@ public class ChooseBrowser {
                     System.out.println(new File("C:\\Program Files\\Firefox\\firefox.exe").exists());
                 }
 
-                System.out.println("➡️ browserPath 決定結果：" + browserPath);
-
                 if (browserPath != null) {
                     new ProcessBuilder(browserPath, url).start();
                 } else {

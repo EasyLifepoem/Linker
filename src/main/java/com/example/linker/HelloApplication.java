@@ -1,14 +1,20 @@
 package com.example.linker;
 
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+
 
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+    @FXML
+    private TextArea consoleOutput;
+
     // 加這一行：在一開始就準備好全域資料
     public static LineModel Global_LineModel;
     @Override

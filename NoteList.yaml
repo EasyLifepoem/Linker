@@ -57,6 +57,13 @@ WebType:
       澜汉化组] - 紳士漫畫-專註分享漢化本子&#124;邪惡漫畫"
     Number: 299410
     URL: "https://www.wnacg.com/photos-index-aid-299410.html"
+  - name: "(C105) [猫の幼虫観察会] 目挑心招 (アークナイツ) [Jumppmuj個人漢化] - 紳士漫畫-專註分享漢化本子&#124;邪惡漫畫"
+    Number: 299530
+    URL: "https://www.wnacg.com/photos-index-aid-299530.html"
+  - name: "[猫の幼虫] リーベリは卵生…？ (アークナイツ)｜黎博利是卵生的…？ [角都九阳个人汉化] - 紳士漫畫-專註分享漢化本子&#124;邪惡漫\
+      畫"
+    Number: 299624
+    URL: "https://www.wnacg.com/photos-index-aid-299624.html"
 - type: "youtube"
   links:
   - name: "https://www.youtube.com/watch?v=UPtG_38Oq8o"
@@ -72,6 +79,5 @@ WebType:
     URL: "https://18comic.vip/album/1123386/%E5%85%AD%E4%B9%9D%E5%A4%A7%E5%AD%B8%E6%B1%82%E7%94%9F%E6%89%8B%E5%86%8A-%E7%A6%81%E6%BC%AB%E6%BC%A2%E5%8C%96%E7%B5%84"
 SelectedBrowser: "C:\\Program Files\\Mozilla Firefox\\firefox.exe"
 CustomBrowsers:
-  - "C:\\MyTools\\BrowserX.exe"
-  - "D:\\Portable\\Brave.exe"
-
+- "C:\\MyTools\\BrowserX.exe"
+- "D:\\Portable\\Brave.exe"
